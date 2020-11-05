@@ -4,7 +4,7 @@ Este repositório é um dos módulos do sistema de gestão de carregamento de ve
 
 Uma das partes essenciais deste grande sistema é a interacção com o utilizador de forma a que se consiga apresentar-lhe a informação necessária e permitir que este possa tomar decisões simples associadas ao carregamento. Numa abordagem mínima e essencial a interface será feita localmente no carregador e adicionalmente será feita através de uma Aplicação para smartphones.
 
-
+![alt text](https://github.com/up201606615/SEAI-Interface/blob/devel/Design/Interface.jpg)
 
 A Interface com o utilizador é um elemento que se baseia na comunicação entre o utilizador eo software, mais especificamente, a componente de Controlo. Assim, é possível dividi-la em trêsdiferentes ramos: Comunicação, Interação com o utilizador e Microcontrolador.A comunicação com o módulo de Controlo será feita através deUser Datagram Protocol(UDP).Foi escolhido este protocolo de comunicação por ser simples e não ser necessária a confirmação dachegada da mensagem.
 
