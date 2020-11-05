@@ -8,7 +8,7 @@ Uma das partes essenciais deste grande sistema é a interacção com o utilizado
   <img src="https://github.com/up201606615/SEAI-Interface/blob/devel/Design/Interface.jpg">
 </p>
 
-A Interface com o utilizador é um elemento que se baseia na comunicação entre o utilizador e o software, mais especificamente, a componente de Controlo. Assim, é possível dividi-la em três diferentes ramos: Comunicação, Interação com o utilizador e Microcontrolador. A comunicação com o módulo de Controlo é feita através de User Datagram Protocol (UDP).Foi escolhido este protocolo de comunicação por ser simples e não ser necessária a confirmação da chegada da mensagem.
+A Interface com o utilizador é um elemento que se baseia na comunicação entre o utilizador e o software, mais especificamente, a componente de Controlo. Assim, é possível dividi-la em três diferentes ramos: Comunicação, Interação com o utilizador e Microcontrolador. A comunicação com o módulo de Controlo é feita através de User Datagram Protocol (UDP). Foi escolhido este protocolo de comunicação por ser simples e não ser necessária a confirmação da chegada da mensagem.
 
 ## Authors
 * André Martins up201605016@fe.up.pt
