@@ -12,7 +12,7 @@ A Interface com o utilizador é um elemento que se baseia na comunicação entre
 
 **Comunicação**
 
-Para que as configurações feitas pelo utilizador sejam passadas ao sistema, terá de ser estabelecer uma via de comunicação entre a Interface a o módulo do Controlo. A comunicação com o módulo de Controlo será feita através de \textit{Transmission Control Protocol} (TCP). Além disso, será também preciso estabelecer uma ligação com a base de dados para consulta de dados necessários para apresentar ao utilizador (preços, disponibilidade, etc.).
+Para que as configurações feitas pelo utilizador sejam passadas ao sistema, terá de ser estabelecer uma via de comunicação entre a Interface a o módulo do Controlo. A comunicação com o módulo de Controlo será feita através de Transmission Control Protocol (TCP). Além disso, será também preciso estabelecer uma ligação com a base de dados para consulta de dados necessários para apresentar ao utilizador (preços, disponibilidade, etc.).
 
 **Interação com o utilizador**
 
