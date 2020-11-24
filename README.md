@@ -1,6 +1,6 @@
 # SEAI-Interface
 
-Este repositório é um dos módulos do sistema de gestão de carregamento de veículos elétricos. Este sistema foi dividido em Controlo, Gestão e Monitorização e Interface com o utilizador.
+Este repositório é um dos módulos do sistema de gestão de carregamento de veículos elétricos. Este sistema foi dividido em Controlo, Gestão e Monitorização e Interface com o Utilizador.
 
 Uma das partes essenciais deste grande sistema é a interacção com o utilizador de forma a que se consiga apresentar-lhe a informação necessária e permitir que este possa tomar decisões simples associadas ao carregamento. Numa abordagem mínima e essencial a interface será feita localmente no carregador e adicionalmente será feita através de uma Aplicação para smartphones.
 
