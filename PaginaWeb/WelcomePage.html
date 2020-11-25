@@ -20,11 +20,21 @@
   <th>Modo de Carregamento</th><th>Preço</th>
   </tr>
   <tr>
-  <td>Rápido</td><td><input type="text" name="precoRapido" id="precoRapido" size="10"> €</td>
+  <td>Rápido</td><td id="precoRapido" size="10"></td>
   </tr>
   <tr>
-  <td>Normal</td><td><input type="text" name="precoNormal" id="precoNormal" size="10"> €</td>
+  <td>Normal</td><td id="precoNormal" size="10"></td>
   </tr>
 </table>
+
+<script>
+  fetch('http://localhost:5000/prices')
+      .then(function (response) {
+          return response.json();
+      }).then(function (price) {
+          document.getElementById("precoNormal").innerHTML = price.normal;
+          document.getElementById("precoRapido").innerHTML = price.premium;
+      });
+</script>
 </body>
 </html>

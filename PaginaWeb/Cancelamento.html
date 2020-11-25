@@ -5,14 +5,22 @@
 	<title>SEAI G</title>
 </head>
 <body>
-<h1>Cancelar o carregamento do veículo</h1>
-<p>Confirma que pretende cancelar o carregamento do veículo? </p>
-<a href="Carregando.html">
-    <button class="button button1">Voltar Atrás</button>
-</a>
-<a href="Terminado.html">
-    <button class="button button2" onclick="sendToControlCancel()">Cancelar Carregamento</button>
-</a>
-
+    <h1>Cancelar o carregamento do veículo</h1>
+    <p>Confirma que pretende cancelar o carregamento do veículo? </p>
+    <a href="Carregando.html">
+        <button class="button button1">Voltar Atrás</button>
+    </a>
+    <a href="Terminado.html">
+        <button class="button button2" 
+        onClick="sendToControlCancel()">
+        Cancelar Carregamento</button>
+    </a>
+    <script type="text/javascript">
+        function sendToControlCancel(){
+            fetch('http://localhost:5000/stop')
+            .then(function (response) {
+                return response.json();
+            });
+    }</script>
 </body>
 </html>
