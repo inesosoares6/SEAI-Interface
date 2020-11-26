@@ -162,7 +162,3 @@ def stop():
 #########  run app  #########
 CORS(app)
 app.run(debug=True)
-
-
-
-        
