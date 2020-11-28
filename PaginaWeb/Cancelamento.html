@@ -12,15 +12,9 @@
     </a>
     <a href="Terminado.html">
         <button class="button button2" 
-        onClick="sendToControlCancel()">
+        onclick="sendToControlCancel()">
         Cancelar Carregamento</button>
     </a>
-    <script type="text/javascript">
-        function sendToControlCancel(){
-            fetch('http://localhost:5000/stop')
-            .then(function (response) {
-                return response.json();
-            });
-    }</script>
+    <script type="text/javascript" src="controlcomms.js"></script>
 </body>
 </html>

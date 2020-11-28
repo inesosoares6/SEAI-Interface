@@ -5,14 +5,14 @@ from flask_cors import CORS
 
 HEADER = 64
 PORT = 5050
-SERVER = "172.29.0.64"
+SERVER = "172.29.0.30"
 ADDR = (SERVER, PORT)
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
 
 premium_tax = 1.45
 
-def send_msg(msg):
+def send_msg(msg, client):
     #Encode msg and header
     encoded_msg = msg.encode(FORMAT)
     msg_length = len(encoded_msg)
@@ -70,62 +70,31 @@ def priceloader():
         return jsonify(message)  # serialize and use JSON headers
 
 
-@app.route('/start_normal', methods=['GET'])
+@app.route('/normal', methods=['GET'])
 def normalstart():
     #GET request
     if request.method == 'GET':
         
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.connect(ADDR)
-        msg = "ID: 202001; State: 1;"
 
-        #Encode msg and header
-        encoded_msg = msg.encode(FORMAT)
-        msg_length = len(encoded_msg)
-        encoded_header = str(msg_length).encode(FORMAT)
-        encoded_header += b' '*(HEADER-len(encoded_header))
-        #Send msgs to server
-        client.send(encoded_header)
-        client.send(encoded_msg)
-
-        msg = DISCONNECT_MESSAGE
-        encoded_msg = msg.encode(FORMAT)
-        msg_length = len(encoded_msg)
-        encoded_header = str(msg_length).encode(FORMAT)
-        encoded_header += b' '*(HEADER-len(encoded_header))
-        #Send msgs to server
-        client.send(encoded_header)
-        client.send(encoded_msg)
+        # Send a message to the SERVER
+        send_msg("ID: 202010; State: 1;", client)
+        send_msg(DISCONNECT_MESSAGE, client)
 
         return jsonify("Normal start sent successfully!")
 
 
-@app.route('/start_premium', methods=['GET'])
+@app.route('/premium', methods=['GET'])
 def premiumstart():
     #GET request
     if request.method == 'GET':
         
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.connect(ADDR)
-        msg = "ID: 202001; State: 2;"
 
-        #Encode msg and header
-        encoded_msg = msg.encode(FORMAT)
-        msg_length = len(encoded_msg)
-        encoded_header = str(msg_length).encode(FORMAT)
-        encoded_header += b' '*(HEADER-len(encoded_header))
-        #Send msgs to server
-        client.send(encoded_header)
-        client.send(encoded_msg)
-
-        msg = DISCONNECT_MESSAGE
-        encoded_msg = msg.encode(FORMAT)
-        msg_length = len(encoded_msg)
-        encoded_header = str(msg_length).encode(FORMAT)
-        encoded_header += b' '*(HEADER-len(encoded_header))
-        #Send msgs to server
-        client.send(encoded_header)
-        client.send(encoded_msg)
+        send_msg("ID: 202010; State: 2;", client)
+        send_msg(DISCONNECT_MESSAGE, client)
 
         return jsonify("Premium start sent successfully!")
 
@@ -137,28 +106,12 @@ def stop():
         
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.connect(ADDR)
-        msg = "ID: 202001; State: -1;"
 
-        #Encode msg and header
-        encoded_msg = msg.encode(FORMAT)
-        msg_length = len(encoded_msg)
-        encoded_header = str(msg_length).encode(FORMAT)
-        encoded_header += b' '*(HEADER-len(encoded_header))
-        #Send msgs to server
-        client.send(encoded_header)
-        client.send(encoded_msg)
-
-        msg = DISCONNECT_MESSAGE
-        encoded_msg = msg.encode(FORMAT)
-        msg_length = len(encoded_msg)
-        encoded_header = str(msg_length).encode(FORMAT)
-        encoded_header += b' '*(HEADER-len(encoded_header))
-        #Send msgs to server
-        client.send(encoded_header)
-        client.send(encoded_msg)
+        send_msg("ID: 202010; State: -1;", client)
+        send_msg(DISCONNECT_MESSAGE, client)
 
         return jsonify("Stop sent successfully!")
 
 #########  run app  #########
 CORS(app)
-app.run(debug=True)
+app.run(debug=True)    

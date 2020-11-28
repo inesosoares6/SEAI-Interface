@@ -13,16 +13,11 @@
         <button class="button button1">Voltar Atrás</button>
     </a>
     <a href="Carregando.html">
-        <button class="button button2" onclick="sendToPremiumControlMode()"> Iniciar Carregamento</button>
+        <button class="button button2" 
+        onclick="sendToPremiumControlMode()">
+        Iniciar Carregamento</button>
     </a>
 
-    <script type="text/javascript">
-        function sendToPremiumControlMode(){
-            fetch('http://localhost:5000/start_premium')
-            .then(function (response) {
-                return response.json();
-            });
-        }
-    </script>
+    <script type="text/javascript" src="controlcomms.js"></script>
 </body>
 </html>

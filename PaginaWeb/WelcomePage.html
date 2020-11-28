@@ -2,7 +2,8 @@
 <html lang="pt">
 <head>
 	<link rel="stylesheet" href="style.css">
-	<title>SEAI G</title>
+  <title>SEAI G</title>
+  <meta http-equiv="refresh" content="30" >
 </head>
 <body>
 <h1>Bem vindo!</h1>
@@ -28,7 +29,7 @@
 </table>
 
 <script>
-  fetch('http://localhost:5000/prices')
+  fetch('http://127.0.0.1:5000/prices')
       .then(function (response) {
           return response.json();
       }).then(function (price) {
