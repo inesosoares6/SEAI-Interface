@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt">
+<script src="controlcomms.js"></script>
 <head>
 	<link rel="stylesheet" href="style.css">
-	<title>SEAI G</title>
+    <title>SEAI G</title>
+    <meta http-equiv="refresh" content="15" >
 </head>
 <body>
     <h1>Veículo em carregamento</h1>
@@ -10,6 +12,14 @@
     <a href="Cancelamento.html">
         <button class="button button1">Interromper Carregamento</button>
     </a>
+    
+    <script>checkInterrupt();</script>
 
+    <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+          <p3>Carregamento interrompido pelo operador, por favor aguarde...</p3>
+        </div>
+    </div>
 </body>
 </html>

@@ -5,7 +5,7 @@ from flask_cors import CORS
 
 HEADER = 64
 PORT = 5050
-SERVER = "172.29.0.30"
+SERVER = "172.29.0.92"
 ADDR = (SERVER, PORT)
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
@@ -23,6 +23,38 @@ def send_msg(msg, client):
     client.send(encoded_msg)
 
 def get_pricesDB():
+    conn = None
+
+    try:
+        conn = psycopg2.connect(
+            host="db.fe.up.pt",
+            database="up201504961",
+            user="up201504961",
+            password="32FiuJr2X")
+
+        cur = conn.cursor()
+        cur.execute("SELECT id FROM seai.historic")
+        row = cur.fetchone()
+        
+        #i = 0
+
+        #while row is not None:
+        value = row[0]
+        #    i += 1
+        #    row = cur.fetchone()
+
+        cur.close()
+
+        return value
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+
+    finally:
+        if conn is not None:
+            conn.close()
+
+def check_interrupt():
     conn = None
 
     try:
@@ -111,6 +143,16 @@ def stop():
         send_msg(DISCONNECT_MESSAGE, client)
 
         return jsonify("Stop sent successfully!")
+
+
+@app.route('/interrupt', methods=['GET'])
+def interrupter():
+    #GET request
+    if request.method == 'GET':
+        
+        x = check_interrupt()
+        message = {'flag':x}
+        return jsonify(message)  # serialize and use JSON headers
 
 #########  run app  #########
 CORS(app)
