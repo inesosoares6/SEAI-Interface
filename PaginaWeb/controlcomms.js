@@ -24,7 +24,7 @@ function checkInterrupt(){
     .then(function (response) {
         return response.json();
     }).then(function (interruption) {
-        if(interruption.flag == 1){
+        if(interruption.flag == 5){
             var modal = document.getElementById("myModal");
             modal.style.display = "block";
         }
