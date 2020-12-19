@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt">
+<script src="controlcomms.js"></script>
 <head>
 	<link rel="stylesheet" href="style.css">
   <title>SEAI G</title>
@@ -8,12 +9,9 @@
 <body>
 <h1>Bem vindo!</h1>
 <p>Por favor selecione o modo de carregamento que deseja: </p>
-<a href="RapidoCarregamento.html">
-  <button class="button button1">Modo Rápido</button>
-</a>
-<a href="NormalCarregamento.html">
-  <button class="button button2">Modo Normal</button>
-</a>
+
+<button class="button button1" onclick="charge(1);">Modo Rápido</button>
+<button class="button button2" onclick="charge(2);">Modo Normal</button>
 
 <span style="display:block; height: 500;"></span>
 <table>
@@ -28,14 +26,6 @@
   </tr>
 </table>
 
-<script>
-  fetch('http://127.0.0.1:5000/prices')
-      .then(function (response) {
-          return response.json();
-      }).then(function (price) {
-          document.getElementById("precoNormal").innerHTML = price.normal;
-          document.getElementById("precoRapido").innerHTML = price.premium;
-      });
-</script>
+<script>getPrices();</script>
 </body>
 </html>
