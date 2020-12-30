@@ -210,7 +210,7 @@ def priceloaderAPP(id):
         
         x = float(get_pricesDB(id))
         
-        message = {'prices':{'normal':x,'premium':x*premium_tax,'green':x*green_tax}}
+        message = {'normal':x,'premium':x*premium_tax,'green':x*green_tax}
 
         return jsonify(message)  # serialize and use JSON headers
 
