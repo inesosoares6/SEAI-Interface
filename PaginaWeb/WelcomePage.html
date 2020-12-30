@@ -10,8 +10,9 @@
 <h1>Bem vindo!</h1>
 <p>Por favor selecione o modo de carregamento que deseja: </p>
 
-<button class="button button1" onclick="charge(1);">Modo Rápido</button>
 <button class="button button2" onclick="charge(2);">Modo Normal</button>
+<button class="button button4" onclick="charge(1);">Modo Rápido</button>
+<button class="button button1" onclick="charge(3);">Modo Verde</button>
 
 <span style="display:block; height: 500;"></span>
 <table>
@@ -19,10 +20,13 @@
   <th>Modo de Carregamento</th><th>Preço</th>
   </tr>
   <tr>
+  <td>Normal</td><td id="precoNormal" size="10"></td>
+  </tr>
+  <tr>
   <td>Rápido</td><td id="precoRapido" size="10"></td>
   </tr>
   <tr>
-  <td>Normal</td><td id="precoNormal" size="10"></td>
+  <td>Verde</td><td id="precoVerde" size="10"></td>
   </tr>
 </table>
 

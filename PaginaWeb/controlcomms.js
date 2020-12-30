@@ -1,10 +1,22 @@
 function getPrices(){
-    fetch('http://127.0.0.1:5000/prices')
+    id = getURLparam();    
+    fetch('http://127.0.0.1:5000/prices/'+id)
     .then(function (response) {
         return response.json();
     }).then(function (price) {
         document.getElementById("precoNormal").innerHTML = price.normal;
         document.getElementById("precoRapido").innerHTML = price.premium;
+        document.getElementById("precoVerde").innerHTML = price.green;
+    });
+}
+
+function getTotalPrice(){
+    id = getURLparam();
+    fetch('http://127.0.0.1:5000/finalprice/'+id)
+    .then(function (response) {
+        return response.json();
+    }).then(function (price) {
+        document.getElementById("precoTotal").innerHTML = price.total;
     });
 }
 
@@ -15,6 +27,9 @@ function charge(mode){
     }
     else if(mode==2){
         location.replace("NormalCarregamento.html?id="+id);
+    }
+    else if(mode==3){
+        location.replace("VerdeCarregamento.html?id="+id);
     }
 }
 
@@ -30,6 +45,15 @@ function sendToNormalControlMode(){
 function sendToPremiumControlMode(){
     id = getURLparam();
     fetch('http://127.0.0.1:5000/premium/'+id)
+    .then(function (response) {
+    return response.json();
+    });
+    location.replace("Carregando.html?id="+id);
+}
+
+function sendToGreenControlMode(){
+    id = getURLparam();
+    fetch('http://127.0.0.1:5000/green/'+id)
     .then(function (response) {
     return response.json();
     });
@@ -65,13 +89,18 @@ function sendToControlCancel(){
     location.replace("Terminado.html?id="+id);
 }
 
+function goEndMenu(){
+    id = getURLparam();
+    location.replace("OpeningPage.html?id="+id);
+}
+
 function checkInterrupt(){
     id = getURLparam();
     fetch('http://127.0.0.1:5000/interrupt/'+id)
     .then(function (response) {
         return response.json();
     }).then(function (interruption) {
-        if(interruption.flag == 1){
+        if(interruption.flag == true){
             var modal = document.getElementById("myModal");
             modal.style.display = "block";
         }
@@ -88,9 +117,20 @@ function checkConnection(){
     .then(function (response) {
         return response.json();
     }).then(function (connection) {
-        console.log(connection.flag);
-        if(connection.flag == 144){
+        if(connection.flag == 1){
             location.replace("WelcomePage.html?id="+id);
+        }
+    });
+}
+
+function checkFinish(){
+    id = getURLparam();
+    fetch('http://127.0.0.1:5000/finish/'+id)
+    .then(function (response) {
+        return response.json();
+    }).then(function (finish) {
+        if(finish.flag == 1){
+            location.replace("Terminado.html?id="+id);
         }
     });
 }

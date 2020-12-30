@@ -5,12 +5,13 @@ from flask_cors import CORS
 
 HEADER = 64
 PORT = 5050
-SERVER = "172.29.0.43"
+SERVER = "172.29.0.70"
 ADDR = (SERVER, PORT)
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
 
 premium_tax = 1.45
+green_tax = 1.6
 
 def send_msg(msg, client):
     #Encode msg and header
@@ -22,7 +23,7 @@ def send_msg(msg, client):
     client.send(encoded_header)
     client.send(encoded_msg)
 
-def get_pricesDB():
+def get_pricesDB(id):
     conn = None
 
     try:
@@ -33,15 +34,37 @@ def get_pricesDB():
             password="32FiuJr2X")
 
         cur = conn.cursor()
-        cur.execute("SELECT id FROM seai.historic")
+        cur.execute("SELECT priceper_kwh FROM seai.charger WHERE charger_id="+str(id))
         row = cur.fetchone()
         
-        #i = 0
-
-        #while row is not None:
         value = row[0]
-        #    i += 1
-        #    row = cur.fetchone()
+
+        cur.close()
+
+        return value
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+
+    finally:
+        if conn is not None:
+            conn.close()
+
+def get_finalPrice(id):
+    conn = None
+
+    try:
+        conn = psycopg2.connect(
+            host="db.fe.up.pt",
+            database="up201504961",
+            user="up201504961",
+            password="32FiuJr2X")
+
+        cur = conn.cursor()
+        cur.execute("SELECT total_cost FROM seai.charging WHERE charger_id="+str(id))
+        row = cur.fetchone()
+        
+        value = row[0]
 
         cur.close()
 
@@ -65,15 +88,10 @@ def check_interrupt(id):
             password="32FiuJr2X")
 
         cur = conn.cursor()
-        cur.execute("SELECT id FROM seai.historic")
+        cur.execute("SELECT operator_interr FROM seai.charger WHERE charger_id="+str(id))
         row = cur.fetchone()
         
-        #i = 0
-
-        #while row is not None:
         value = row[0]
-        #    i += 1
-        #    row = cur.fetchone()
 
         cur.close()
 
@@ -97,15 +115,64 @@ def check_connection(id):
             password="32FiuJr2X")
 
         cur = conn.cursor()
-        cur.execute("SELECT id FROM seai.historic")
+        cur.execute("SELECT new_connection FROM seai.charger WHERE charger_id="+str(id))
         row = cur.fetchone()
         
-        #i = 0
-
-        #while row is not None:
         value = row[0]
-        #    i += 1
-        #    row = cur.fetchone()
+
+        cur.close()
+
+        return value
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+
+    finally:
+        if conn is not None:
+            conn.close()
+
+def check_finish(id):
+    conn = None
+
+    try:
+        conn = psycopg2.connect(
+            host="db.fe.up.pt",
+            database="up201504961",
+            user="up201504961",
+            password="32FiuJr2X")
+
+        cur = conn.cursor()
+        cur.execute("SELECT operator_interr FROM seai.charger WHERE charger_id="+str(id))
+        row = cur.fetchone()
+        
+        value = row[0]
+
+        cur.close()
+
+        return value
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+
+    finally:
+        if conn is not None:
+            conn.close()
+
+def checkparkingslots():
+    conn = None
+
+    try:
+        conn = psycopg2.connect(
+            host="db.fe.up.pt",
+            database="up201504961",
+            user="up201504961",
+            password="32FiuJr2X")
+
+        cur = conn.cursor()
+        cur.execute("SELECT COUNT(*) FROM seai.charger WHERE state_occupation=FALSE")
+        row = cur.fetchone()
+        
+        value = row[0]
 
         cur.close()
 
@@ -124,13 +191,47 @@ app = Flask(__name__)
 #         API setup         #
 #############################
 
-@app.route('/prices', methods=['GET'])
-def priceloader():
+@app.route('/prices/<int:id>', methods=['GET'])
+def priceloader(id):
     #GET request
     if request.method == 'GET':
         
-        x = get_pricesDB()
-        message = {'normal':str("{:.2f}".format(x))+' €/hora', 'premium':str("{:.2f}".format(x*premium_tax))+' €/hora'}
+        x = float(get_pricesDB(id))
+        message = {'normal':str("{:.2f}".format(x))+' €/kWh', 
+                   'premium':str("{:.2f}".format(x*premium_tax))+' €/kWh',
+                   'green':str("{:.2f}".format(x*green_tax))+' €/kWh'}
+        return jsonify(message)  # serialize and use JSON headers
+
+
+@app.route('/pricesAPP/<int:id>', methods=['GET'])
+def priceloaderAPP(id):
+    #GET request
+    if request.method == 'GET':
+        
+        x = float(get_pricesDB(id))
+        
+        message = {'prices':{'normal':x,'premium':x*premium_tax,'green':x*green_tax}}
+
+        return jsonify(message)  # serialize and use JSON headers
+
+
+@app.route('/finalprice/<int:id>', methods=['GET'])
+def finalpriceloader(id):
+    #GET request
+    if request.method == 'GET':
+        
+        x = float(get_finalPrice(id))
+        message = {'total':str("{:.2f}".format(x))+' €'}
+        return jsonify(message)  # serialize and use JSON headers
+
+
+@app.route('/finalpriceAPP/<int:id>', methods=['GET'])
+def finalpriceloaderAPP(id):
+    #GET request
+    if request.method == 'GET':
+        
+        x = float(get_finalPrice(id))
+        message = {'total':x}
         return jsonify(message)  # serialize and use JSON headers
 
 
@@ -163,6 +264,21 @@ def premiumstart(id):
         return jsonify("Premium start sent successfully!")
 
 
+@app.route('/green/<int:id>', methods=['GET'])
+def greenstart(id):
+    #GET request
+    if request.method == 'GET':
+        
+        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client.connect(ADDR)
+
+        # Send a message to the SERVER
+        send_msg("ID: "+str(id)+"; State: 3;", client)
+        send_msg(DISCONNECT_MESSAGE, client)
+
+        return jsonify("Green start sent successfully!")
+
+
 @app.route('/stop/<int:id>', methods=['GET'])
 def stop(id):
     #GET request
@@ -186,6 +302,7 @@ def interrupter(id):
         message = {'flag':x}
         return jsonify(message)  # serialize and use JSON headers
 
+
 @app.route('/connection/<int:id>', methods=['GET'])
 def connector(id):
     #GET request
@@ -193,6 +310,26 @@ def connector(id):
         
         x = check_connection(id)
         message = {'flag':x}
+        return jsonify(message)  # serialize and use JSON headers
+
+
+@app.route('/finish/<int:id>', methods=['GET'])
+def finisher(id):
+    #GET request
+    if request.method == 'GET':
+        
+        x = check_finish(id)
+        message = {'flag':x}
+        return jsonify(message)  # serialize and use JSON headers
+
+
+@app.route('/checkslots/', methods=['GET'])
+def slotchecker():
+    #GET request
+    if request.method == 'GET':
+
+        x = int(checkparkingslots())
+        message = {'slots':x}
         return jsonify(message)  # serialize and use JSON headers
 
 #########  run app  #########
