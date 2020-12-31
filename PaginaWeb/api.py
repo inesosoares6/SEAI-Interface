@@ -158,6 +158,34 @@ def check_finish(id):
         if conn is not None:
             conn.close()
 
+
+def check_occupation(id):
+    conn = None
+
+    try:
+        conn = psycopg2.connect(
+            host="db.fe.up.pt",
+            database="up201504961",
+            user="up201504961",
+            password="32FiuJr2X")
+
+        cur = conn.cursor()
+        cur.execute("SELECT state_occupation FROM seai.charger WHERE charger_id="+str(id))
+        row = cur.fetchone()
+        
+        value = row[0]
+
+        cur.close()
+
+        return value
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+
+    finally:
+        if conn is not None:
+            conn.close()
+
 def checkparkingslots():
     conn = None
 
@@ -330,6 +358,17 @@ def slotchecker():
 
         x = int(checkparkingslots())
         message = {'slots':x}
+        return jsonify(message)  # serialize and use JSON headers
+
+
+@app.route('/readytocharge/<int:id>', methods=['GET'])
+def initializer(id):
+    #GET request
+    if request.method == 'GET':
+
+        x = check_connection(id)
+        y = check_occupation(id)
+        message = {'flag':x&(not(y))}
         return jsonify(message)  # serialize and use JSON headers
 
 #########  run app  #########
