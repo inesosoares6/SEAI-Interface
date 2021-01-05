@@ -1,11 +1,12 @@
 ########  imports  ##########
 import psycopg2, socket
+from common import *
 from flask import Flask, jsonify, request, render_template
 from flask_cors import CORS
 
 HEADER = 64
 PORT = 5050
-SERVER = "172.29.0.86"
+SERVER = "172.29.0.120"
 ADDR = (SERVER, PORT)
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
@@ -13,15 +14,15 @@ DISCONNECT_MESSAGE = "!DISCONNECT"
 premium_tax = 1.45
 green_tax = 1.6
 
-def send_msg(msg, client):
-    #Encode msg and header
-    encoded_msg = msg.encode(FORMAT)
-    msg_length = len(encoded_msg)
-    encoded_header = str(msg_length).encode(FORMAT)
-    encoded_header += b' '*(HEADER-len(encoded_header))
-    #Send msgs to server
-    client.send(encoded_header)
-    client.send(encoded_msg)
+# def send_msg(msg, client):
+#     #Encode msg and header
+#     encoded_msg = msg.encode(FORMAT)
+#     msg_length = len(encoded_msg)
+#     encoded_header = str(msg_length).encode(FORMAT)
+#     encoded_header += b' '*(HEADER-len(encoded_header))
+#     #Send msgs to server
+#     client.send(encoded_header)
+#     client.send(encoded_msg)
 
 def get_pricesDB(id):
     conn = None
@@ -326,8 +327,31 @@ def normalstart(id):
         client.connect(ADDR)
 
         # Send a message to the SERVER
-        send_msg("ID: "+str(id)+"; State: 1;", client)
-        send_msg(DISCONNECT_MESSAGE, client)
+        msg = {
+            "module": 'interface', #<-
+            "chargerID": id, #<-
+            "stateOccupation": 0,
+            "newConnection": 0, #<-
+            "chargingMode": 0, #<- carregamento normal
+            "voltageMode": 0,
+            "instPower": 0,
+            "maxPower": 0,
+            "voltage": 0
+        }
+        send_json_message(client, msg)
+
+        msg1 = {
+            "module": 'disconnected', #<-
+            "chargerID": 0, #<-
+            "stateOccupation": 0,
+            "newConnection": 0, #<-
+            "chargingMode": 0, #<- carregamento normal
+            "voltageMode": 0,
+            "instPower": 0,
+            "maxPower": 0,
+            "voltage": 0
+        }
+        send_json_message(client, msg1)
 
         return jsonify("Normal start sent successfully!")
 
@@ -340,8 +364,31 @@ def premiumstart(id):
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.connect(ADDR)
 
-        send_msg("ID: "+str(id)+"; State: 2;", client)
-        send_msg(DISCONNECT_MESSAGE, client)
+        msg = {
+            "module": 'interface', #<-
+            "chargerID": id, #<-
+            "stateOccupation": 0,
+            "newConnection": 0, #<-
+            "chargingMode": 1, #<- carregamento rápido
+            "voltageMode": 0,
+            "instPower": 0,
+            "maxPower": 0,
+            "voltage": 0
+        }
+        send_json_message(client, msg)
+
+        msg1 = {
+            "module": 'disconnected', #<-
+            "chargerID": 0, #<-
+            "stateOccupation": 0,
+            "newConnection": 0, #<-
+            "chargingMode": 0, #<- carregamento normal
+            "voltageMode": 0,
+            "instPower": 0,
+            "maxPower": 0,
+            "voltage": 0
+        }
+        send_json_message(client, msg1)
 
         return jsonify("Premium start sent successfully!")
 
@@ -355,8 +402,31 @@ def greenstart(id):
         client.connect(ADDR)
 
         # Send a message to the SERVER
-        send_msg("ID: "+str(id)+"; State: 3;", client)
-        send_msg(DISCONNECT_MESSAGE, client)
+        msg = {
+            "module": 'interface', #<-
+            "chargerID": id, #<-
+            "stateOccupation": 0,
+            "newConnection": 0, #<-
+            "chargingMode": 0, #<- carregamento verde
+            "voltageMode": 0,
+            "instPower": 0,
+            "maxPower": 0,
+            "voltage": 0
+        }
+        send_json_message(client, msg)
+
+        msg1 = {
+            "module": 'disconnected', #<-
+            "chargerID": 0, #<-
+            "stateOccupation": 0,
+            "newConnection": 0, #<-
+            "chargingMode": 0, #<- carregamento normal
+            "voltageMode": 0,
+            "instPower": 0,
+            "maxPower": 0,
+            "voltage": 0
+        }
+        send_json_message(client, msg1)
 
         return jsonify("Green start sent successfully!")
 
@@ -369,8 +439,31 @@ def stop(id):
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.connect(ADDR)
 
-        send_msg("ID: "+str(id)+"; State: -1;", client)
-        send_msg(DISCONNECT_MESSAGE, client)
+        msg = {
+            "module": 'interface', #<-
+            "chargerID": id, #<-
+            "stateOccupation": 0,
+            "newConnection": 0, #<-
+            "chargingMode": 2, #<- paragem de carregamento
+            "voltageMode": 0,
+            "instPower": 0,
+            "maxPower": 0,
+            "voltage": 0
+        }
+        send_json_message(client, msg)
+        
+        msg1 = {
+            "module": 'disconnected', #<-
+            "chargerID": 0, #<-
+            "stateOccupation": 0,
+            "newConnection": 0, #<-
+            "chargingMode": 0, #<- carregamento normal
+            "voltageMode": 0,
+            "instPower": 0,
+            "maxPower": 0,
+            "voltage": 0
+        }
+        send_json_message(client, msg1)
 
         return jsonify("Stop sent successfully!")
 

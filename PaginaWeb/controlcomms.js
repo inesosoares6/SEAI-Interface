@@ -10,7 +10,7 @@ function getPrices(){
     });
 }
 
-function getTotalPrice(){
+function getTotalPrice(){setTimeout(function(){
     id = getURLparam();
     fetch('http://127.0.0.1:5000/finalprice/'+id)
     .then(function (response) {
@@ -18,18 +18,44 @@ function getTotalPrice(){
     }).then(function (price) {
         document.getElementById("precoTotal").innerHTML = price.total;
     });
-}
+},1500);}
 
 function charge(mode){
     id = getURLparam();
     if(mode==1){
-        location.replace("RapidoCarregamento.html?id="+id);
+        fetch('http://127.0.0.1:5000/premiumavailable/'+id)
+        .then(function (response) {
+        return response.json();
+        }).then(function (available) {
+            if(available.flag == 1){
+                var modal = document.getElementById("fastChargeModal");
+                modal.style.display = "none";
+                location.replace("RapidoCarregamento.html?id="+id);
+            }
+            else {
+                var modal = document.getElementById("fastChargeModal");
+                modal.style.display = "block";
+            }
+        });
     }
     else if(mode==2){
         location.replace("NormalCarregamento.html?id="+id);
     }
     else if(mode==3){
-        location.replace("VerdeCarregamento.html?id="+id);
+        fetch('http://127.0.0.1:5000/greenavailable/'+id)
+        .then(function (response) {
+        return response.json();
+        }).then(function (available) {
+            if(available.flag == 1){
+                var modal = document.getElementById("fastChargeModal");
+                modal.style.display = "none";
+                location.replace("VerdeCarregamento.html?id="+id);
+            }
+            else {
+                var modal = document.getElementById("greenChargeModal");
+                modal.style.display = "block";
+            }
+        });
     }
 }
 
@@ -92,6 +118,11 @@ function sendToControlCancel(){
 function goEndMenu(){
     id = getURLparam();
     location.replace("OpeningPage.html?id="+id);
+}
+
+function goStartMenu(){
+    id = getURLparam();
+    location.replace("WelcomePage.html?id="+id);
 }
 
 function checkInterrupt(){
