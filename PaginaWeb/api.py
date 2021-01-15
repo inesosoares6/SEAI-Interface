@@ -6,7 +6,7 @@ from flask_cors import CORS
 
 HEADER = 64
 PORT = 5050
-SERVER = "172.29.0.120"
+SERVER = "172.29.0.29"
 ADDR = (SERVER, PORT)
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
@@ -143,7 +143,7 @@ def check_finish(id):
             password="32FiuJr2X")
 
         cur = conn.cursor()
-        cur.execute("SELECT stoping_time FROM seai.charging WHERE charger_id="+str(id))
+        cur.execute("SELECT charge_state FROM seai.charging WHERE charger_id="+str(id))
         row = cur.fetchone()
         
         value = row[0]
@@ -186,6 +186,35 @@ def check_occupation(id):
     finally:
         if conn is not None:
             conn.close()
+
+
+def check_charging(id):
+    conn = None
+
+    try:
+        conn = psycopg2.connect(
+            host="db.fe.up.pt",
+            database="up201504961",
+            user="up201504961",
+            password="32FiuJr2X")
+
+        cur = conn.cursor()
+        cur.execute("SELECT charging_mode FROM seai.charger WHERE charger_id="+str(id))
+        row = cur.fetchone()
+        
+        value = row[0]
+
+        cur.close()
+
+        return value
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+
+    finally:
+        if conn is not None:
+            conn.close()
+
 
 def checkparkingslots():
     conn = None
@@ -495,9 +524,25 @@ def finisher(id):
         
         x = check_finish(id)
 
-        if x != None:
+        if bool(x) == True: 
             x = 1
-        else: 
+        elif bool(x) == False: 
+            x = 0
+
+        message = {'flag':x}
+        return jsonify(message)  # serialize and use JSON headers
+
+
+@app.route('/charging/<int:id>', methods=['GET'])
+def chargingchecker(id):
+    #GET request
+    if request.method == 'GET':
+        
+        x = check_charging(id)
+
+        if bool(x) == True: 
+            x = 1
+        elif bool(x) == False: 
             x = 0
 
         message = {'flag':x}

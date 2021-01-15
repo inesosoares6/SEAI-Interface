@@ -166,6 +166,18 @@ function checkFinish(){
     });
 }
 
+function checkCharging(){
+    id = getURLparam();
+    fetch('http://127.0.0.1:5000/charging/'+id)
+    .then(function (response) {
+        return response.json();
+    }).then(function (charging) {
+        if(charging.flag == 1){
+            location.replace("Carregando.html?id="+id);
+        }
+    });
+}
+
 function load(){
     var dots = window.setInterval( function() {
         var wait = document.getElementById("wait");
