@@ -6,7 +6,7 @@ from flask_cors import CORS
 
 HEADER = 64
 PORT = 5050
-SERVER = "172.29.0.29"
+SERVER = "172.29.0.17"
 ADDR = (SERVER, PORT)
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
@@ -24,7 +24,7 @@ green_tax = 1.6
 #     client.send(encoded_header)
 #     client.send(encoded_msg)
 
-def get_pricesDB(id):
+def get_priceNormalDB(id):
     conn = None
 
     try:
@@ -51,6 +51,60 @@ def get_pricesDB(id):
         if conn is not None:
             conn.close()
 
+def get_priceFastDB(id):
+    conn = None
+
+    try:
+        conn = psycopg2.connect(
+            host="db.fe.up.pt",
+            database="up201504961",
+            user="up201504961",
+            password="32FiuJr2X")
+
+        cur = conn.cursor()
+        cur.execute("SELECT priceper_kwh_fc FROM seai.charger WHERE charger_id="+str(id))
+        row = cur.fetchone()
+        
+        value = row[0]
+
+        cur.close()
+
+        return value
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+
+    finally:
+        if conn is not None:
+            conn.close()
+
+def get_priceGreenDB(id):
+    conn = None
+
+    try:
+        conn = psycopg2.connect(
+            host="db.fe.up.pt",
+            database="up201504961",
+            user="up201504961",
+            password="32FiuJr2X")
+
+        cur = conn.cursor()
+        cur.execute("SELECT priceper_kwh_green FROM seai.charger WHERE charger_id="+str(id))
+        row = cur.fetchone()
+        
+        value = row[0]
+
+        cur.close()
+
+        return value
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+
+    finally:
+        if conn is not None:
+            conn.close()
+
 def get_finalPrice(id):
     conn = None
 
@@ -62,7 +116,7 @@ def get_finalPrice(id):
             password="32FiuJr2X")
 
         cur = conn.cursor()
-        cur.execute("SELECT total_cost FROM seai.charging WHERE charger_id="+str(id))
+        cur.execute("SELECT total_cost FROM seai.charging WHERE charger_id="+str(id)+"order by id desc")
         row = cur.fetchone()
         
         value = row[0]
@@ -89,7 +143,7 @@ def check_interrupt(id):
             password="32FiuJr2X")
 
         cur = conn.cursor()
-        cur.execute("SELECT operator_interr FROM seai.charger WHERE charger_id="+str(id))
+        cur.execute("SELECT fori FROM seai.charging WHERE charger_id="+str(id)+"order by id desc")
         row = cur.fetchone()
         
         value = row[0]
@@ -143,14 +197,17 @@ def check_finish(id):
             password="32FiuJr2X")
 
         cur = conn.cursor()
-        cur.execute("SELECT charge_state FROM seai.charging WHERE charger_id="+str(id))
-        row = cur.fetchone()
+        cur.execute("SELECT stoping_time FROM seai.charging WHERE charger_id="+str(id)+"order by id desc")
+        row1 = cur.fetchone()
+        cur.execute("SELECT fori FROM seai.charging WHERE charger_id="+str(id)+"order by id desc")
+        row2 = cur.fetchone()
         
-        value = row[0]
+        value = row1[0]
+        flag = row2[0]
 
         cur.close()
 
-        return value
+        return value, flag
 
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
@@ -199,7 +256,7 @@ def check_charging(id):
             password="32FiuJr2X")
 
         cur = conn.cursor()
-        cur.execute("SELECT charging_mode FROM seai.charger WHERE charger_id="+str(id))
+        cur.execute("SELECT state_occupation FROM seai.charger WHERE charger_id="+str(id))
         row = cur.fetchone()
         
         value = row[0]
@@ -308,10 +365,14 @@ def priceloader(id):
     #GET request
     if request.method == 'GET':
         
-        x = float(get_pricesDB(id))
+        x = float(get_priceNormalDB(id))
+        y = float(get_priceFastDB(id))
+        z = float(get_priceGreenDB(id))
+
         message = {'normal':str("{:.2f}".format(x))+' €/kWh', 
-                   'premium':str("{:.2f}".format(x*premium_tax))+' €/kWh',
-                   'green':str("{:.2f}".format(x*green_tax))+' €/kWh'}
+                   'premium':str("{:.2f}".format(y))+' €/kWh',
+                   'green':str("{:.2f}".format(z))+' €/kWh'}
+
         return jsonify(message)  # serialize and use JSON headers
 
 
@@ -320,9 +381,11 @@ def priceloaderAPP(id):
     #GET request
     if request.method == 'GET':
         
-        x = float(get_pricesDB(id))
+        x = float(get_priceNormalDB(id))
+        y = float(get_priceFastDB(id))
+        z = float(get_priceGreenDB(id))
         
-        message = {'normal':x,'premium':x*premium_tax,'green':x*green_tax}
+        message = {'normal':x,'premium':y,'green':z}
 
         return jsonify(message)  # serialize and use JSON headers
 
@@ -357,10 +420,10 @@ def normalstart(id):
 
         # Send a message to the SERVER
         msg = {
-            "module": 'interface', #<-
-            "chargerID": id, #<-
+            "module": 'interface', 
+            "chargerID": id, 
             "stateOccupation": 0,
-            "newConnection": 0, #<-
+            "newConnection": 0, 
             "chargingMode": 0, #<- carregamento normal
             "voltageMode": 0,
             "instPower": 0,
@@ -370,11 +433,11 @@ def normalstart(id):
         send_json_message(client, msg)
 
         msg1 = {
-            "module": 'disconnected', #<-
-            "chargerID": 0, #<-
+            "module": 'disconnected', 
+            "chargerID": 0, 
             "stateOccupation": 0,
-            "newConnection": 0, #<-
-            "chargingMode": 0, #<- carregamento normal
+            "newConnection": 0,
+            "chargingMode": 0, 
             "voltageMode": 0,
             "instPower": 0,
             "maxPower": 0,
@@ -394,10 +457,10 @@ def premiumstart(id):
         client.connect(ADDR)
 
         msg = {
-            "module": 'interface', #<-
-            "chargerID": id, #<-
+            "module": 'interface', 
+            "chargerID": id, 
             "stateOccupation": 0,
-            "newConnection": 0, #<-
+            "newConnection": 0, 
             "chargingMode": 1, #<- carregamento rápido
             "voltageMode": 0,
             "instPower": 0,
@@ -407,11 +470,11 @@ def premiumstart(id):
         send_json_message(client, msg)
 
         msg1 = {
-            "module": 'disconnected', #<-
-            "chargerID": 0, #<-
+            "module": 'disconnected', 
+            "chargerID": 0, 
             "stateOccupation": 0,
-            "newConnection": 0, #<-
-            "chargingMode": 0, #<- carregamento normal
+            "newConnection": 0, 
+            "chargingMode": 0, 
             "voltageMode": 0,
             "instPower": 0,
             "maxPower": 0,
@@ -432,11 +495,11 @@ def greenstart(id):
 
         # Send a message to the SERVER
         msg = {
-            "module": 'interface', #<-
-            "chargerID": id, #<-
+            "module": 'interface', 
+            "chargerID": id, 
             "stateOccupation": 0,
-            "newConnection": 0, #<-
-            "chargingMode": 0, #<- carregamento verde
+            "newConnection": 0, 
+            "chargingMode": 3, #<- carregamento verde
             "voltageMode": 0,
             "instPower": 0,
             "maxPower": 0,
@@ -445,11 +508,11 @@ def greenstart(id):
         send_json_message(client, msg)
 
         msg1 = {
-            "module": 'disconnected', #<-
-            "chargerID": 0, #<-
+            "module": 'disconnected', 
+            "chargerID": 0, 
             "stateOccupation": 0,
-            "newConnection": 0, #<-
-            "chargingMode": 0, #<- carregamento normal
+            "newConnection": 0, 
+            "chargingMode": 0, 
             "voltageMode": 0,
             "instPower": 0,
             "maxPower": 0,
@@ -469,10 +532,10 @@ def stop(id):
         client.connect(ADDR)
 
         msg = {
-            "module": 'interface', #<-
-            "chargerID": id, #<-
+            "module": 'interface', 
+            "chargerID": id, 
             "stateOccupation": 0,
-            "newConnection": 0, #<-
+            "newConnection": 0, 
             "chargingMode": 2, #<- paragem de carregamento
             "voltageMode": 0,
             "instPower": 0,
@@ -482,11 +545,11 @@ def stop(id):
         send_json_message(client, msg)
         
         msg1 = {
-            "module": 'disconnected', #<-
-            "chargerID": 0, #<-
+            "module": 'disconnected', 
+            "chargerID": 0, 
             "stateOccupation": 0,
-            "newConnection": 0, #<-
-            "chargingMode": 0, #<- carregamento normal
+            "newConnection": 0, 
+            "chargingMode": 0,
             "voltageMode": 0,
             "instPower": 0,
             "maxPower": 0,
@@ -522,11 +585,11 @@ def finisher(id):
     #GET request
     if request.method == 'GET':
         
-        x = check_finish(id)
+        x, flag = check_finish(id)
 
-        if bool(x) == True: 
+        if ((x != None) and (flag == False)): 
             x = 1
-        elif bool(x) == False: 
+        else: 
             x = 0
 
         message = {'flag':x}
