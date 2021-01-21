@@ -125,7 +125,7 @@ function goStartMenu(){
     location.replace("WelcomePage.html?id="+id);
 }
 
-function checkInterrupt(){
+function checkInterrupt(){setTimeout(function(){
     id = getURLparam();
     fetch('http://127.0.0.1:5000/interrupt/'+id)
     .then(function (response) {
@@ -140,7 +140,7 @@ function checkInterrupt(){
             modal.style.display = "none";
         }
     });
-}
+},1000);}
 
 function checkConnection(){
     id = getURLparam();
@@ -154,7 +154,7 @@ function checkConnection(){
     });
 }
 
-function checkFinish(){
+function checkFinish(){setTimeout(function(){
     id = getURLparam();
     fetch('http://127.0.0.1:5000/finish/'+id)
     .then(function (response) {
@@ -164,7 +164,7 @@ function checkFinish(){
             location.replace("Terminado.html?id="+id);
         }
     });
-}
+},1000);}
 
 function checkCharging(){
     id = getURLparam();
