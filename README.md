@@ -4,7 +4,9 @@ Este repositório é um dos módulos do sistema de gestão de carregamento de ve
 
 Uma das partes essenciais deste grande sistema é a interacção com o utilizador de forma a que se consiga apresentar-lhe a informação necessária e permitir que este possa tomar decisões simples associadas ao carregamento. Numa abordagem mínima e essencial a interface será feita localmente no carregador e adicionalmente será feita através de uma aplicação para smartphones.
 
-![Design-Interface](https://user-images.githubusercontent.com/47570179/105633549-24576000-5e51-11eb-9b72-f466386e5cfd.jpg)
+<p align="center">
+<img src="https://user-images.githubusercontent.com/47570179/105633549-24576000-5e51-11eb-9b72-f466386e5cfd.jpg">
+</p>
 
 A Interface com o utilizador é um elemento que se baseia na comunicação entre o utilizador e o software, mais especificamente, a componente de Controlo e base de dados. Assim, é possível dividi-la em dois diferentes ramos: Comunicação e Interação com o Utilizador.
 
